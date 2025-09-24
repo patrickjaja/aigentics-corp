@@ -1,0 +1,665 @@
+openapi: 3.1.0
+info:
+  title: AI Offer Agent - Admin API
+  version: 1.0.0
+  description: Internal API for sales managers and administrators
+servers:
+  - url: https://admin.offer-agent.example.com/v1
+    description: Admin portal backend
+tags:
+  - name: approvals
+    description: Approval workflow management
+  - name: analytics
+    description: Analytics and reporting
+  - name: notifications
+    description: Notification management
+security:
+  - BearerAuth: []
+paths:
+  /approvals/pending:
+    get:
+      tags:
+        - approvals
+      summary: Get pending approvals
+      operationId: getPendingApprovals
+      parameters:
+        - name: approver_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of pending approvals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApprovalRequest'
+
+  /approvals/{workflowId}:
+    get:
+      tags:
+        - approvals
+      summary: Get approval workflow details
+      operationId: getApprovalWorkflow
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalWorkflow'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /approvals/{workflowId}/review:
+    post:
+      tags:
+        - approvals
+      summary: Start reviewing an approval request
+      operationId: startReview
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Review started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [in_review]
+                  locked_by:
+                    type: string
+                    format: uuid
+                  locked_until:
+                    type: string
+                    format: date-time
+        '409':
+          description: Already being reviewed by another user
+
+  /approvals/{workflowId}/decide:
+    post:
+      tags:
+        - approvals
+      summary: Make a decision on approval request
+      operationId: makeDecision
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecision'
+      responses:
+        '200':
+          description: Decision recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow_id:
+                    type: string
+                    format: uuid
+                  outcome:
+                    type: string
+                    enum: [approved, rejected, revision_requested]
+                  offer_status:
+                    type: string
+                  customer_notified:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /approvals/{workflowId}/modify-offer:
+    patch:
+      tags:
+        - approvals
+      summary: Modify offer during approval
+      operationId: modifyOfferDuringApproval
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferModifications'
+      responses:
+        '200':
+          description: Offer modified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  new_version:
+                    type: integer
+                  modifications_applied:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /analytics/offers:
+    get:
+      tags:
+        - analytics
+      summary: Get offer analytics
+      operationId: getOfferAnalytics
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: group_by
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferAnalytics'
+
+  /analytics/conversion:
+    get:
+      tags:
+        - analytics
+      summary: Get conversion metrics
+      operationId: getConversionMetrics
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, 1y]
+            default: 30d
+      responses:
+        '200':
+          description: Conversion metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionMetrics'
+
+  /notifications/high-value-leads:
+    get:
+      tags:
+        - notifications
+      summary: Get recent high-value lead notifications
+      operationId: getHighValueLeads
+      parameters:
+        - name: threshold
+          in: query
+          schema:
+            type: number
+            default: 100000
+        - name: hours
+          in: query
+          schema:
+            type: integer
+            default: 24
+            maximum: 168
+      responses:
+        '200':
+          description: High-value leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  leads:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HighValueLead'
+
+components:
+  schemas:
+    ApprovalRequest:
+      type: object
+      required:
+        - workflow_id
+        - offer_id
+        - requested_at
+        - status
+        - offer_value
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        offer_id:
+          type: string
+          format: uuid
+        offer_number:
+          type: string
+        requested_at:
+          type: string
+          format: date-time
+        requested_by:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_review, approved, rejected, revision_requested]
+        offer_value:
+          $ref: '#/components/schemas/Money'
+        customer_name:
+          type: string
+        project_category:
+          type: string
+
+    ApprovalWorkflow:
+      type: object
+      required:
+        - workflow_id
+        - offer_details
+        - status
+        - history
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        offer_details:
+          $ref: '#/components/schemas/OfferSummary'
+        status:
+          type: string
+          enum: [pending, in_review, approved, rejected, revision_requested]
+        requested_by:
+          type: string
+        requested_at:
+          type: string
+          format: date-time
+        approver:
+          type: string
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowEvent'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        modifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Modification'
+
+    ApprovalDecision:
+      type: object
+      required:
+        - outcome
+        - reason
+      properties:
+        outcome:
+          type: string
+          enum: [approved, rejected, revision_requested]
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 1000
+        conditions:
+          type: array
+          items:
+            type: string
+        notify_customer:
+          type: boolean
+          default: false
+
+    OfferModifications:
+      type: object
+      required:
+        - modifications
+        - reason
+      properties:
+        modifications:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - path
+              - value
+              - reason
+            properties:
+              path:
+                type: string
+                description: JSONPath to field
+                example: "$.work_packages[0].hourly_rate.amount"
+              value:
+                description: New value
+              reason:
+                type: string
+        reason:
+          type: string
+          description: Overall reason for modifications
+
+    OfferSummary:
+      type: object
+      properties:
+        offer_id:
+          type: string
+          format: uuid
+        offer_number:
+          type: string
+        total_value:
+          $ref: '#/components/schemas/Money'
+        work_packages_count:
+          type: integer
+        estimated_hours_total:
+          type: number
+        customer:
+          $ref: '#/components/schemas/CustomerSummary'
+        project:
+          $ref: '#/components/schemas/ProjectSummary'
+
+    CustomerSummary:
+      type: object
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        company_name:
+          type: string
+        contact_person:
+          type: string
+        email:
+          type: string
+          format: email
+
+    ProjectSummary:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        requirements_count:
+          type: integer
+
+    WorkflowEvent:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+        actor:
+          type: string
+        details:
+          type: string
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        author:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        content:
+          type: string
+
+    Modification:
+      type: object
+      properties:
+        field_path:
+          type: string
+        old_value:
+          description: Previous value
+        new_value:
+          description: New value
+        modified_by:
+          type: string
+        modified_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+
+    OfferAnalytics:
+      type: object
+      properties:
+        period:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date
+            to:
+              type: string
+              format: date
+        summary:
+          type: object
+          properties:
+            total_generated:
+              type: integer
+            total_value:
+              $ref: '#/components/schemas/Money'
+            average_value:
+              $ref: '#/components/schemas/Money'
+            conversion_rate:
+              type: number
+            average_generation_time:
+              type: number
+              description: Seconds
+        by_category:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              count:
+                type: integer
+              total_value:
+                $ref: '#/components/schemas/Money'
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        timeline:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              generated:
+                type: integer
+              sent:
+                type: integer
+              accepted:
+                type: integer
+
+    ConversionMetrics:
+      type: object
+      properties:
+        funnel:
+          type: object
+          properties:
+            conversations_started:
+              type: integer
+            conversations_completed:
+              type: integer
+            offers_generated:
+              type: integer
+            offers_downloaded:
+              type: integer
+            offers_accepted:
+              type: integer
+        rates:
+          type: object
+          properties:
+            conversation_to_offer:
+              type: number
+            offer_to_download:
+              type: number
+            download_to_accept:
+              type: number
+            overall:
+              type: number
+        average_time:
+          type: object
+          properties:
+            conversation_duration:
+              type: number
+              description: Minutes
+            offer_generation:
+              type: number
+              description: Seconds
+            decision_time:
+              type: number
+              description: Days
+
+    HighValueLead:
+      type: object
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        offer_id:
+          type: string
+          format: uuid
+        offer_number:
+          type: string
+        company_name:
+          type: string
+        contact_person:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        offer_value:
+          $ref: '#/components/schemas/Money'
+        created_at:
+          type: string
+          format: date-time
+        notification_sent_at:
+          type: string
+          format: date-time
+
+    Money:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        formatted:
+          type: string
+
+    Error:
+      type: object
+      required:
+        - error_code
+        - message
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from Keycloak

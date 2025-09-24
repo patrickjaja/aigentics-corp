@@ -1,0 +1,310 @@
+openapi: 3.1.0
+info:
+  title: AI Offer Agent - Conversation API
+  version: 1.0.0
+  description: API for managing AI-powered conversations to gather project requirements
+servers:
+  - url: https://api.offer-agent.example.com/v1
+    description: Production API Gateway
+tags:
+  - name: conversations
+    description: Conversation management endpoints
+paths:
+  /conversations:
+    post:
+      tags:
+        - conversations
+      summary: Start a new conversation
+      operationId: startConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - language
+              properties:
+                language:
+                  type: string
+                  enum: [de, en, fr, es, it, nl, pl, pt, cs, da, el, hu, ro, sv, bg, hr, et, fi, ga, lt, lv, mt, sk, sl]
+                  description: ISO 639-1 language code
+                session_id:
+                  type: string
+                  description: Optional session ID for tracking
+      responses:
+        '201':
+          description: Conversation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /conversations/{conversationId}:
+    get:
+      tags:
+        - conversations
+      summary: Get conversation details
+      operationId: getConversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Conversation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /conversations/{conversationId}/messages:
+    post:
+      tags:
+        - conversations
+      summary: Send a message in the conversation
+      operationId: sendMessage
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  maxLength: 5000
+                  description: User's message
+                context:
+                  type: object
+                  description: Additional context for the message
+      responses:
+        '200':
+          description: AI response with next questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Maximum conversation rounds exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /conversations/{conversationId}/complete:
+    post:
+      tags:
+        - conversations
+      summary: Mark conversation as complete
+      operationId: completeConversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Conversation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                    format: uuid
+                    description: Generated project ID
+                  requirements_gathered:
+                    type: integer
+                    description: Number of requirements identified
+                  ready_for_offer:
+                    type: boolean
+                    description: Whether enough info for offer generation
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    ConversationResponse:
+      type: object
+      required:
+        - conversation_id
+        - status
+        - initial_questions
+      properties:
+        conversation_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [active, paused, completed, abandoned, escalated]
+        initial_questions:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Question'
+        language:
+          type: string
+          description: Conversation language
+
+    ConversationDetails:
+      type: object
+      required:
+        - conversation_id
+        - status
+        - started_at
+        - completion_percentage
+      properties:
+        conversation_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [active, paused, completed, abandoned, escalated]
+        started_at:
+          type: string
+          format: date-time
+        last_interaction_at:
+          type: string
+          format: date-time
+        completion_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        interactions_count:
+          type: integer
+        gathered_requirements:
+          type: array
+          items:
+            type: string
+
+    AIResponse:
+      type: object
+      required:
+        - message
+        - questions
+        - completion_percentage
+      properties:
+        message:
+          type: string
+          description: AI's response message
+        questions:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Question'
+        completion_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        suggested_category:
+          type: string
+          enum: [software_development, consulting, infrastructure, mixed]
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    Question:
+      type: object
+      required:
+        - id
+        - text
+        - type
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        type:
+          type: string
+          enum: [text, single_choice, multiple_choice, number, date]
+        options:
+          type: array
+          items:
+            type: string
+        required:
+          type: boolean
+          default: false
+        help_text:
+          type: string
+
+    Error:
+      type: object
+      required:
+        - error_code
+        - message
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for A2A integration
+
+security:
+  - ApiKey: []

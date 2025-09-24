@@ -47,7 +47,65 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**I. GDPR Compliance & Data Privacy**
+- [ ] PII handling documented with legal basis
+- [ ] Encryption at rest/transit specified (AES-256)
+- [ ] Data retention and deletion policies defined
+- [ ] Right to erasure implementation planned
+
+**II. German Business Standards**
+- [ ] DIN 5008 compliance for documents
+- [ ] Proper date/currency formatting (DD.MM.YYYY, 1.234,56 €)
+- [ ] Sie-Form in all communications
+- [ ] Required legal footer elements included
+
+**III. Domain-Driven Design**
+- [ ] Bounded contexts identified
+- [ ] Aggregates and value objects defined
+- [ ] Anti-corruption layers at boundaries
+- [ ] Ubiquitous language documented
+
+**IV. Event Sourcing**
+- [ ] Events defined for all state changes
+- [ ] Event schema with required metadata
+- [ ] CQRS read/write models separated
+- [ ] Audit trail retention (7 years)
+
+**V. Progressive Disclosure**
+- [ ] Max 5 decision points per interaction
+- [ ] Essential info captured first
+- [ ] Context-sensitive help planned
+- [ ] Save/resume capability designed
+
+**VI. Test Coverage**
+- [ ] 100% coverage for business logic
+- [ ] Test types defined (unit/integration/contract)
+- [ ] CI/CD pipeline <5 min feedback
+- [ ] Mutation testing planned
+
+**VII. A2A Protocol**
+- [ ] DIDs for agent identification
+- [ ] DIDComm for secure messaging
+- [ ] Verifiable credentials support
+- [ ] Protocol versioning strategy
+
+**VIII. Circuit Breakers**
+- [ ] External service integrations identified
+- [ ] Failure thresholds defined (5/60s)
+- [ ] Fallback strategies documented
+- [ ] Timeout configurations (3s default)
+
+**IX. LangGraph Orchestration**
+- [ ] Complex workflows use LangGraph
+- [ ] Human checkpoints identified
+- [ ] State machines defined
+- [ ] Execution observability planned
+
+**X. Bilingual Support**
+- [ ] i18n keys for all UI text
+- [ ] German/English resource bundles
+- [ ] Accept-Language header handling
+- [ ] Translation consistency strategy
 
 ## Project Structure
 
@@ -209,4 +267,4 @@ ios/ or android/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*

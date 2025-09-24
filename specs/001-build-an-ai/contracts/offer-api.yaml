@@ -1,0 +1,515 @@
+openapi: 3.1.0
+info:
+  title: AI Offer Agent - Offer API
+  version: 1.0.0
+  description: API for generating and managing offers
+servers:
+  - url: https://api.offer-agent.example.com/v1
+    description: Production API Gateway
+tags:
+  - name: offers
+    description: Offer generation and management
+  - name: customers
+    description: Customer data management
+paths:
+  /offers:
+    post:
+      tags:
+        - offers
+      summary: Generate a new offer
+      operationId: generateOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - project_id
+                - conversation_id
+              properties:
+                project_id:
+                  type: string
+                  format: uuid
+                conversation_id:
+                  type: string
+                  format: uuid
+                customer_id:
+                  type: string
+                  format: uuid
+                  description: Optional if customer already exists
+      responses:
+        '201':
+          description: Offer generated successfully
+          headers:
+            X-Processing-Time:
+              schema:
+                type: integer
+                description: Processing time in milliseconds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Insufficient information for offer generation
+        '503':
+          description: Service temporarily unavailable (30s timeout exceeded)
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Get offer details
+      operationId: getOffer
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Offer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /offers/{offerId}/preview:
+    get:
+      tags:
+        - offers
+      summary: Get offer preview (before customer data)
+      operationId: previewOffer
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: language
+          in: query
+          schema:
+            type: string
+            enum: [de, en, fr, es, it, nl, pl, pt, cs, da, el, hu, ro, sv, bg, hr, et, fi, ga, lt, lv, mt, sk, sl]
+      responses:
+        '200':
+          description: Offer preview HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /offers/{offerId}/download:
+    post:
+      tags:
+        - offers
+      summary: Download offer as PDF
+      operationId: downloadOffer
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerData'
+      responses:
+        '200':
+          description: PDF document
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename="offer-24-0001.pdf"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: GDPR consent not provided
+
+  /offers/{offerId}/approve:
+    post:
+      tags:
+        - offers
+      summary: Submit offer for approval (internal)
+      operationId: submitForApproval
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: Notes for the approver
+      responses:
+        '202':
+          description: Submitted for approval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow_id:
+                    type: string
+                    format: uuid
+                  approver_notified:
+                    type: boolean
+        '400':
+          description: Offer doesn't require approval
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /offers/{offerId}/versions:
+    get:
+      tags:
+        - offers
+      summary: Get offer version history
+      operationId: getOfferVersions
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Version history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferVersion'
+
+  /customers:
+    post:
+      tags:
+        - customers
+      summary: Create customer with GDPR consent
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerData'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer_id:
+                    type: string
+                    format: uuid
+                  gdpr_consent_recorded:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Customer already exists
+
+components:
+  schemas:
+    OfferResponse:
+      type: object
+      required:
+        - offer_id
+        - offer_number
+        - status
+        - total_value
+        - approval_required
+        - created_at
+        - valid_until
+      properties:
+        offer_id:
+          type: string
+          format: uuid
+        offer_number:
+          type: string
+          pattern: '^[0-9]{2}-[0-9]{4}$'
+          example: "24-0001"
+        status:
+          type: string
+          enum: [draft, pending_approval, approved, sent, viewed, accepted, rejected, expired]
+        total_value:
+          $ref: '#/components/schemas/Money'
+        approval_required:
+          type: boolean
+        approval_workflow_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        valid_until:
+          type: string
+          format: date
+
+    OfferDetails:
+      allOf:
+        - $ref: '#/components/schemas/OfferResponse'
+        - type: object
+          required:
+            - work_packages
+            - version
+          properties:
+            version:
+              type: integer
+              minimum: 1
+            work_packages:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkPackage'
+            terms_and_conditions:
+              type: string
+            project_details:
+              $ref: '#/components/schemas/ProjectSummary'
+
+    WorkPackage:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - deliverables
+        - estimated_hours
+        - hourly_rate
+        - total_cost
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        deliverables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deliverable'
+        estimated_hours:
+          $ref: '#/components/schemas/EstimatedHours'
+        hourly_rate:
+          $ref: '#/components/schemas/Money'
+        total_cost:
+          $ref: '#/components/schemas/Money'
+        dependencies:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    Deliverable:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        acceptance_criteria:
+          type: array
+          items:
+            type: string
+
+    EstimatedHours:
+      type: object
+      required:
+        - expected
+        - confidence
+      properties:
+        optimistic:
+          type: number
+        likely:
+          type: number
+        pessimistic:
+          type: number
+        expected:
+          type: number
+          description: Calculated using PERT formula
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    Money:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: string
+          pattern: '^[0-9]+\.[0-9]{2}$'
+          example: "15000.00"
+        currency:
+          type: string
+          enum: [EUR, CHF]
+          default: EUR
+        formatted:
+          type: string
+          example: "15.000,00 €"
+          description: German formatted display string
+
+    ProjectSummary:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [software_development, consulting, infrastructure, mixed]
+        requirements_count:
+          type: integer
+        timeline:
+          type: string
+        budget_range:
+          type: string
+
+    CustomerData:
+      type: object
+      required:
+        - company_name
+        - contact_person
+        - email
+        - gdpr_consent
+      properties:
+        company_name:
+          type: string
+          maxLength: 200
+        contact_person:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          pattern: '^\+[0-9]{1,15}$'
+        language_preference:
+          type: string
+          enum: [de, en, fr, es, it, nl, pl, pt, cs, da, el, hu, ro, sv, bg, hr, et, fi, ga, lt, lv, mt, sk, sl]
+          default: de
+        gdpr_consent:
+          $ref: '#/components/schemas/GDPRConsent'
+
+    GDPRConsent:
+      type: object
+      required:
+        - given
+        - purposes
+        - consent_text_version
+      properties:
+        given:
+          type: boolean
+        purposes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum: [offer_generation, marketing, analytics]
+        consent_text_version:
+          type: string
+        ip_address:
+          type: string
+          format: ipv4
+
+    OfferVersion:
+      type: object
+      properties:
+        version:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        modified_by:
+          type: string
+        changes:
+          type: array
+          items:
+            type: string
+
+    Error:
+      type: object
+      required:
+        - error_code
+        - message
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for external agents
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for internal users
+
+security:
+  - ApiKey: []
