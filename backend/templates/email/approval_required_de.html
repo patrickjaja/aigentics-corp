@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genehmigung erforderlich</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #ff9900;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .approval-details {
+            background-color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9900;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Genehmigung erforderlich</h1>
+    </div>
+
+    <div class="content">
+        <h2>Genehmigungsanfrage</h2>
+
+        <p>Ein neues Angebot benötigt Ihre Genehmigung, bevor es an den Kunden versendet werden kann.</p>
+
+        <div class="approval-details">
+            <h3>Angebots-Details</h3>
+            <p><strong>Angebotsnummer:</strong> {{ offer_number }}</p>
+            <p><strong>Kunde:</strong> {{ customer_name }}</p>
+            <p><strong>Gesamtwert:</strong> {{ total_value }} {{ currency }}</p>
+        </div>
+
+        <div class="alert">
+            <strong>Grund:</strong> Der Angebotswert überschreitet die Schwelle von EUR 100.000 und erfordert daher eine Genehmigung durch einen Manager.
+        </div>
+
+        <p>Bitte prüfen Sie das Angebot und entscheiden Sie über die Genehmigung:</p>
+
+        <p style="text-align: center;">
+            <a href="{{ approval_link }}" class="button">Angebot prüfen und genehmigen</a>
+        </p>
+
+        <p>Sie können das Angebot genehmigen, ablehnen oder zur Überarbeitung zurückweisen.</p>
+
+        <p>Mit freundlichen Grüßen,<br>
+        AI Offer Agent System</p>
+    </div>
+
+    <div class="footer">
+        <p>Dies ist eine automatisch generierte E-Mail.</p>
+        <p>&copy; 2025 AI Offer Agent. Alle Rechte vorbehalten.</p>
+    </div>
+</body>
+</html>

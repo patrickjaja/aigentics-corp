@@ -1,0 +1,281 @@
+{
+  "common": {
+    "appName": "KI-Angebots-Agent",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "submit": "Absenden",
+    "continue": "Fortfahren",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "yes": "Ja",
+    "no": "Nein",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "required": "Erforderlich",
+    "optional": "Optional",
+    "selectLanguage": "Sprache auswählen",
+    "currency": "€",
+    "date": {
+      "format": "DD.MM.YYYY",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "tomorrow": "Morgen"
+    },
+    "time": {
+      "format": "HH:mm",
+      "hours": "Stunden",
+      "minutes": "Minuten",
+      "seconds": "Sekunden"
+    }
+  },
+  "navigation": {
+    "home": "Startseite",
+    "offers": "Angebote",
+    "conversations": "Gespräche",
+    "customers": "Kunden",
+    "admin": "Administration",
+    "analytics": "Analysen",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "conversation": {
+    "title": "Neues Angebot erstellen",
+    "subtitle": "Ich helfe Ihnen, ein maßgeschneidertes Angebot zu erstellen",
+    "startNew": "Neues Gespräch beginnen",
+    "continue": "Gespräch fortsetzen",
+    "placeholder": "Beschreiben Sie Ihr Projekt...",
+    "send": "Senden",
+    "thinking": "Ich überlege...",
+    "typing": "Schreibt...",
+    "maxQuestionsReached": "Maximale Anzahl an Fragen für diese Runde erreicht",
+    "escalated": "Ihr Gespräch wurde an einen menschlichen Berater weitergeleitet",
+    "completed": "Gespräch abgeschlossen",
+    "saved": "Gespräch gespeichert",
+    "savedUntil": "Gespeichert bis {{date}}",
+    "progress": "Fortschritt: {{percentage}}%",
+    "questions": {
+      "category": "Welche Art von Projekt möchten Sie umsetzen?",
+      "budget": "Haben Sie ein Budgetrahmen?",
+      "timeline": "Bis wann soll das Projekt abgeschlossen sein?",
+      "team": "Benötigen Sie ein komplettes Team oder einzelne Experten?",
+      "technology": "Haben Sie technologische Präferenzen?"
+    },
+    "errors": {
+      "failed": "Gespräch konnte nicht gestartet werden",
+      "sendMessage": "Nachricht konnte nicht gesendet werden",
+      "load": "Gespräch konnte nicht geladen werden"
+    }
+  },
+  "customer": {
+    "title": "Kundendaten",
+    "companyName": "Firmenname",
+    "contactPerson": "Ansprechpartner",
+    "email": "E-Mail-Adresse",
+    "phone": "Telefonnummer",
+    "language": "Bevorzugte Sprache",
+    "gdpr": {
+      "title": "Datenschutzerklärung",
+      "consent": "Ich stimme der Verarbeitung meiner personenbezogenen Daten gemäß der Datenschutzerklärung zu",
+      "required": "Die Zustimmung ist erforderlich, um fortzufahren",
+      "purposes": {
+        "offerGeneration": "Angebotserstellung",
+        "marketing": "Marketing",
+        "analytics": "Analysen"
+      },
+      "withdraw": "Einwilligung widerrufen",
+      "delete": "Meine Daten löschen",
+      "deleteConfirm": "Sind Sie sicher, dass Sie Ihre Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteRequested": "Löschantrag eingereicht. Ihre Daten werden nach der gesetzlichen Aufbewahrungsfrist von 4 Jahren gelöscht.",
+      "viewData": "Meine Daten anzeigen",
+      "exportData": "Meine Daten exportieren"
+    },
+    "errors": {
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein",
+      "required": "Dieses Feld ist erforderlich"
+    }
+  },
+  "offer": {
+    "title": "Angebot",
+    "number": "Angebotsnummer",
+    "date": "Datum",
+    "validUntil": "Gültig bis",
+    "version": "Version",
+    "status": {
+      "draft": "Entwurf",
+      "pendingApproval": "Genehmigung ausstehend",
+      "approved": "Genehmigt",
+      "sent": "Versendet",
+      "viewed": "Angesehen",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt",
+      "expired": "Abgelaufen"
+    },
+    "workPackages": {
+      "title": "Arbeitspakete",
+      "name": "Name",
+      "description": "Beschreibung",
+      "deliverables": "Liefergegenstände",
+      "estimatedHours": "Geschätzte Stunden",
+      "hourlyRate": "Stundensatz",
+      "totalCost": "Gesamtkosten",
+      "optimistic": "Optimistisch",
+      "likely": "Wahrscheinlich",
+      "pessimistic": "Pessimistisch",
+      "expected": "Erwartet",
+      "confidence": "Konfidenz"
+    },
+    "summary": {
+      "title": "Zusammenfassung",
+      "totalHours": "Gesamtstunden",
+      "totalCost": "Gesamtkosten",
+      "averageRate": "Durchschnittlicher Stundensatz",
+      "estimatedDuration": "Geschätzte Dauer"
+    },
+    "actions": {
+      "download": "Angebot herunterladen",
+      "send": "Angebot versenden",
+      "accept": "Angebot annehmen",
+      "reject": "Angebot ablehnen",
+      "requestChanges": "Änderungen anfragen",
+      "viewPdf": "PDF anzeigen"
+    },
+    "approval": {
+      "required": "Dieses Angebot erfordert eine Genehmigung (Wert > 100.000 €)",
+      "requestApproval": "Genehmigung anfordern",
+      "pending": "Genehmigung ausstehend",
+      "approved": "Genehmigt von {{approver}} am {{date}}",
+      "rejected": "Abgelehnt von {{approver}} am {{date}}",
+      "reason": "Begründung"
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "payment": "Zahlungsbedingungen",
+      "warranty": "Gewährleistung",
+      "liability": "Haftung"
+    },
+    "errors": {
+      "generation": "Angebot konnte nicht erstellt werden",
+      "download": "Download fehlgeschlagen",
+      "send": "Versand fehlgeschlagen",
+      "notFound": "Angebot nicht gefunden"
+    },
+    "notifications": {
+      "generated": "Angebot erfolgreich erstellt",
+      "sent": "Angebot erfolgreich versendet",
+      "accepted": "Angebot angenommen",
+      "rejected": "Angebot abgelehnt"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "dashboard": "Dashboard",
+    "approvals": {
+      "title": "Genehmigungen",
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "reviewOffer": "Angebot prüfen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "requestRevision": "Überarbeitung anfordern",
+      "comments": "Kommentare",
+      "addComment": "Kommentar hinzufügen",
+      "history": "Verlauf",
+      "decision": "Entscheidung",
+      "conditions": "Bedingungen"
+    },
+    "customers": {
+      "title": "Kunden",
+      "total": "Gesamt",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "offers": {
+      "title": "Angebote",
+      "recent": "Kürzlich",
+      "byStatus": "Nach Status"
+    },
+    "analytics": {
+      "title": "Analysen",
+      "conversionRate": "Konversionsrate",
+      "averageValue": "Durchschnittlicher Wert",
+      "generationTime": "Erstellungszeit",
+      "acceptanceRate": "Annahmequote"
+    }
+  },
+  "analytics": {
+    "title": "Analysen",
+    "offers": {
+      "title": "Angebote",
+      "total": "Gesamt",
+      "byStatus": "Nach Status",
+      "byCategory": "Nach Kategorie",
+      "averageValue": "Durchschnittlicher Wert",
+      "totalValue": "Gesamtwert"
+    },
+    "conversion": {
+      "title": "Konversion",
+      "funnel": "Trichter",
+      "rate": "Rate",
+      "byStage": "Nach Phase"
+    },
+    "performance": {
+      "title": "Leistung",
+      "generationTime": "Erstellungszeit",
+      "responseTime": "Antwortzeit",
+      "uptime": "Verfügbarkeit"
+    },
+    "timeRange": {
+      "today": "Heute",
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "quarter": "Dieses Quartal",
+      "year": "Dieses Jahr",
+      "custom": "Benutzerdefiniert"
+    }
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "invalidPhone": "Ungültige Telefonnummer",
+    "minLength": "Mindestlänge: {{min}} Zeichen",
+    "maxLength": "Maximallänge: {{max}} Zeichen",
+    "min": "Mindestwert: {{min}}",
+    "max": "Maximalwert: {{max}}",
+    "pattern": "Ungültiges Format"
+  },
+  "errors": {
+    "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.",
+    "unauthorized": "Nicht autorisiert. Bitte melden Sie sich an.",
+    "forbidden": "Zugriff verweigert.",
+    "notFound": "Nicht gefunden.",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "timeout": "Zeitüberschreitung. Bitte versuchen Sie es erneut.",
+    "rateLimitExceeded": "Zu viele Anfragen. Bitte warten Sie einen Moment."
+  },
+  "success": {
+    "saved": "Erfolgreich gespeichert",
+    "deleted": "Erfolgreich gelöscht",
+    "updated": "Erfolgreich aktualisiert",
+    "created": "Erfolgreich erstellt",
+    "sent": "Erfolgreich gesendet"
+  },
+  "formal": {
+    "greeting": "Sehr geehrte Damen und Herren,",
+    "closing": "Mit freundlichen Grüßen",
+    "you": "Sie",
+    "your": "Ihr/Ihre"
+  }
+}

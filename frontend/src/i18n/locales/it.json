@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "language": "it",
+    "translationStatus": "pending_gpt4_translation",
+    "requiresHumanReview": true,
+    "baseVersion": "1.0.0",
+    "lastUpdated": "2025-10-06"
+  },
+  "common": {
+    "appName": "[NEEDS_TRANSLATION] AI Offer Agent",
+    "loading": "[NEEDS_TRANSLATION] Loading...",
+    "error": "[NEEDS_TRANSLATION] Error",
+    "success": "[NEEDS_TRANSLATION] Success"
+  },
+  "_notice": "This file requires translation. Keys marked with [NEEDS_TRANSLATION] should be translated using GPT-4 and then reviewed by a native speaker. Use the German (de.json) or English (en.json) version as the source."
+}

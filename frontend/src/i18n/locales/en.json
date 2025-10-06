@@ -1,0 +1,281 @@
+{
+  "common": {
+    "appName": "AI Offer Agent",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "continue": "Continue",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "download": "Download",
+    "upload": "Upload",
+    "required": "Required",
+    "optional": "Optional",
+    "selectLanguage": "Select Language",
+    "currency": "€",
+    "date": {
+      "format": "DD/MM/YYYY",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "tomorrow": "Tomorrow"
+    },
+    "time": {
+      "format": "HH:mm",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "offers": "Offers",
+    "conversations": "Conversations",
+    "customers": "Customers",
+    "admin": "Administration",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "conversation": {
+    "title": "Create New Offer",
+    "subtitle": "I will help you create a tailored offer",
+    "startNew": "Start New Conversation",
+    "continue": "Continue Conversation",
+    "placeholder": "Describe your project...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "typing": "Typing...",
+    "maxQuestionsReached": "Maximum questions reached for this round",
+    "escalated": "Your conversation has been escalated to a human consultant",
+    "completed": "Conversation completed",
+    "saved": "Conversation saved",
+    "savedUntil": "Saved until {{date}}",
+    "progress": "Progress: {{percentage}}%",
+    "questions": {
+      "category": "What type of project would you like to implement?",
+      "budget": "Do you have a budget range?",
+      "timeline": "When should the project be completed?",
+      "team": "Do you need a complete team or individual experts?",
+      "technology": "Do you have any technology preferences?"
+    },
+    "errors": {
+      "failed": "Failed to start conversation",
+      "sendMessage": "Failed to send message",
+      "load": "Failed to load conversation"
+    }
+  },
+  "customer": {
+    "title": "Customer Information",
+    "companyName": "Company Name",
+    "contactPerson": "Contact Person",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "language": "Preferred Language",
+    "gdpr": {
+      "title": "Privacy Policy",
+      "consent": "I agree to the processing of my personal data according to the privacy policy",
+      "required": "Consent is required to continue",
+      "purposes": {
+        "offerGeneration": "Offer Generation",
+        "marketing": "Marketing",
+        "analytics": "Analytics"
+      },
+      "withdraw": "Withdraw Consent",
+      "delete": "Delete My Data",
+      "deleteConfirm": "Are you sure you want to delete your data? This action cannot be undone.",
+      "deleteRequested": "Deletion request submitted. Your data will be deleted after the legal retention period of 4 years.",
+      "viewData": "View My Data",
+      "exportData": "Export My Data"
+    },
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number",
+      "required": "This field is required"
+    }
+  },
+  "offer": {
+    "title": "Offer",
+    "number": "Offer Number",
+    "date": "Date",
+    "validUntil": "Valid Until",
+    "version": "Version",
+    "status": {
+      "draft": "Draft",
+      "pendingApproval": "Pending Approval",
+      "approved": "Approved",
+      "sent": "Sent",
+      "viewed": "Viewed",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "workPackages": {
+      "title": "Work Packages",
+      "name": "Name",
+      "description": "Description",
+      "deliverables": "Deliverables",
+      "estimatedHours": "Estimated Hours",
+      "hourlyRate": "Hourly Rate",
+      "totalCost": "Total Cost",
+      "optimistic": "Optimistic",
+      "likely": "Likely",
+      "pessimistic": "Pessimistic",
+      "expected": "Expected",
+      "confidence": "Confidence"
+    },
+    "summary": {
+      "title": "Summary",
+      "totalHours": "Total Hours",
+      "totalCost": "Total Cost",
+      "averageRate": "Average Hourly Rate",
+      "estimatedDuration": "Estimated Duration"
+    },
+    "actions": {
+      "download": "Download Offer",
+      "send": "Send Offer",
+      "accept": "Accept Offer",
+      "reject": "Reject Offer",
+      "requestChanges": "Request Changes",
+      "viewPdf": "View PDF"
+    },
+    "approval": {
+      "required": "This offer requires approval (value > €100,000)",
+      "requestApproval": "Request Approval",
+      "pending": "Approval Pending",
+      "approved": "Approved by {{approver}} on {{date}}",
+      "rejected": "Rejected by {{approver}} on {{date}}",
+      "reason": "Reason"
+    },
+    "terms": {
+      "title": "Terms and Conditions",
+      "payment": "Payment Terms",
+      "warranty": "Warranty",
+      "liability": "Liability"
+    },
+    "errors": {
+      "generation": "Failed to generate offer",
+      "download": "Download failed",
+      "send": "Failed to send",
+      "notFound": "Offer not found"
+    },
+    "notifications": {
+      "generated": "Offer successfully generated",
+      "sent": "Offer successfully sent",
+      "accepted": "Offer accepted",
+      "rejected": "Offer rejected"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "dashboard": "Dashboard",
+    "approvals": {
+      "title": "Approvals",
+      "pending": "Pending",
+      "completed": "Completed",
+      "reviewOffer": "Review Offer",
+      "approve": "Approve",
+      "reject": "Reject",
+      "requestRevision": "Request Revision",
+      "comments": "Comments",
+      "addComment": "Add Comment",
+      "history": "History",
+      "decision": "Decision",
+      "conditions": "Conditions"
+    },
+    "customers": {
+      "title": "Customers",
+      "total": "Total",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "offers": {
+      "title": "Offers",
+      "recent": "Recent",
+      "byStatus": "By Status"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "conversionRate": "Conversion Rate",
+      "averageValue": "Average Value",
+      "generationTime": "Generation Time",
+      "acceptanceRate": "Acceptance Rate"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "offers": {
+      "title": "Offers",
+      "total": "Total",
+      "byStatus": "By Status",
+      "byCategory": "By Category",
+      "averageValue": "Average Value",
+      "totalValue": "Total Value"
+    },
+    "conversion": {
+      "title": "Conversion",
+      "funnel": "Funnel",
+      "rate": "Rate",
+      "byStage": "By Stage"
+    },
+    "performance": {
+      "title": "Performance",
+      "generationTime": "Generation Time",
+      "responseTime": "Response Time",
+      "uptime": "Uptime"
+    },
+    "timeRange": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "quarter": "This Quarter",
+      "year": "This Year",
+      "custom": "Custom"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "minLength": "Minimum length: {{min}} characters",
+    "maxLength": "Maximum length: {{max}} characters",
+    "min": "Minimum value: {{min}}",
+    "max": "Maximum value: {{max}}",
+    "pattern": "Invalid format"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Network error. Please check your internet connection.",
+    "unauthorized": "Unauthorized. Please log in.",
+    "forbidden": "Access denied.",
+    "notFound": "Not found.",
+    "serverError": "Server error. Please try again later.",
+    "timeout": "Request timeout. Please try again.",
+    "rateLimitExceeded": "Too many requests. Please wait a moment."
+  },
+  "success": {
+    "saved": "Successfully saved",
+    "deleted": "Successfully deleted",
+    "updated": "Successfully updated",
+    "created": "Successfully created",
+    "sent": "Successfully sent"
+  },
+  "formal": {
+    "greeting": "Dear Sir/Madam,",
+    "closing": "Kind regards",
+    "you": "you",
+    "your": "your"
+  }
+}

@@ -1,0 +1,522 @@
+_format_version: "3.0"
+_transform: true
+
+# Kong Gateway Configuration for AI Offer Agent
+# Provides API Gateway with rate limiting, authentication, and routing
+
+services:
+  # Conversation Service
+  - name: conversation-service
+    url: http://backend:8000/v1/conversations
+    protocol: http
+    host: backend
+    port: 8000
+    path: /v1/conversations
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+
+    routes:
+      - name: conversations-route
+        paths:
+          - /v1/conversations
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        https_redirect_status_code: 426
+
+    plugins:
+      # Rate limiting - 100 requests per minute
+      - name: rate-limiting
+        config:
+          minute: 100
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${REDIS_PASSWORD}
+          fault_tolerant: true
+          hide_client_headers: false
+
+      # API Key Authentication for A2A protocol
+      - name: key-auth
+        config:
+          key_names:
+            - X-API-Key
+            - apikey
+          key_in_body: false
+          key_in_header: true
+          key_in_query: false
+          hide_credentials: false
+          anonymous: null
+          run_on_preflight: true
+
+      # Request/Response transformation
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - X-Gateway-Version:1.0.0
+              - X-Forwarded-Proto:https
+          remove:
+            headers:
+              - X-Powered-By
+          replace:
+            headers: []
+
+      # Response transformation
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Content-Type-Options:nosniff
+              - X-Frame-Options:DENY
+              - X-XSS-Protection:1; mode=block
+              - Strict-Transport-Security:max-age=31536000; includeSubDomains
+              - Content-Security-Policy:default-src 'self'
+          remove:
+            headers:
+              - Server
+              - X-Powered-By
+
+      # CORS configuration
+      - name: cors
+        config:
+          origins:
+            - ${FRONTEND_URL}
+            - http://localhost:3000
+            - https://*.aigentics.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - X-API-Key
+            - Authorization
+          exposed_headers:
+            - X-RateLimit-Limit
+            - X-RateLimit-Remaining
+            - X-RateLimit-Reset
+          credentials: true
+          max_age: 3600
+          preflight_continue: false
+
+      # Prometheus metrics
+      - name: prometheus
+        config:
+          per_consumer: true
+          status_code_metrics: true
+          latency_metrics: true
+          bandwidth_metrics: true
+          upstream_health_metrics: true
+
+      # Request logging
+      - name: file-log
+        config:
+          path: /var/log/kong/access.log
+          reopen: true
+
+  # Offer Service
+  - name: offer-service
+    url: http://backend:8000/v1/offers
+    protocol: http
+    host: backend
+    port: 8000
+    path: /v1/offers
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+
+    routes:
+      - name: offers-route
+        paths:
+          - /v1/offers
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        https_redirect_status_code: 426
+
+    plugins:
+      # Rate limiting - 100 requests per minute
+      - name: rate-limiting
+        config:
+          minute: 100
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${REDIS_PASSWORD}
+          fault_tolerant: true
+          hide_client_headers: false
+
+      # API Key Authentication
+      - name: key-auth
+        config:
+          key_names:
+            - X-API-Key
+            - apikey
+          key_in_body: false
+          key_in_header: true
+          key_in_query: false
+          hide_credentials: false
+
+      # Security headers
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Content-Type-Options:nosniff
+              - X-Frame-Options:DENY
+              - X-XSS-Protection:1; mode=block
+              - Strict-Transport-Security:max-age=31536000; includeSubDomains
+              - Content-Security-Policy:default-src 'self'
+
+      # CORS
+      - name: cors
+        config:
+          origins:
+            - ${FRONTEND_URL}
+            - http://localhost:3000
+            - https://*.aigentics.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          credentials: true
+          max_age: 3600
+
+      # Prometheus metrics
+      - name: prometheus
+
+  # Customer Service (GDPR-sensitive)
+  - name: customer-service
+    url: http://backend:8000/v1/customers
+    protocol: http
+    host: backend
+    port: 8000
+    path: /v1/customers
+    connect_timeout: 30000
+    write_timeout: 30000
+    read_timeout: 30000
+    retries: 2
+
+    routes:
+      - name: customers-route
+        paths:
+          - /v1/customers
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - https  # HTTPS only for PII data
+        https_redirect_status_code: 426
+
+    plugins:
+      # Stricter rate limiting for customer data
+      - name: rate-limiting
+        config:
+          minute: 50
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${REDIS_PASSWORD}
+          fault_tolerant: true
+
+      # API Key Authentication
+      - name: key-auth
+        config:
+          key_names:
+            - X-API-Key
+          key_in_header: true
+          hide_credentials: true  # Hide from logs
+
+      # Enhanced security headers for PII endpoints
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Content-Type-Options:nosniff
+              - X-Frame-Options:DENY
+              - X-XSS-Protection:1; mode=block
+              - Strict-Transport-Security:max-age=31536000; includeSubDomains; preload
+              - Content-Security-Policy:default-src 'self'; script-src 'none'; object-src 'none'
+              - Referrer-Policy:no-referrer
+              - Permissions-Policy:geolocation=(), microphone=(), camera=()
+          remove:
+            headers:
+              - Server
+              - X-Powered-By
+              - X-AspNet-Version
+
+      # CORS - more restrictive
+      - name: cors
+        config:
+          origins:
+            - ${FRONTEND_URL}
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+          credentials: true
+          max_age: 600
+
+      # Prometheus metrics (exclude PII from logs)
+      - name: prometheus
+
+  # Admin/Approval Service (JWT authentication)
+  - name: admin-service
+    url: http://backend:8000/v1/approvals
+    protocol: http
+    host: backend
+    port: 8000
+    path: /v1/approvals
+    connect_timeout: 30000
+    write_timeout: 30000
+    read_timeout: 30000
+    retries: 2
+
+    routes:
+      - name: approvals-route
+        paths:
+          - /v1/approvals
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+        strip_path: false
+        preserve_host: false
+        protocols:
+          - https  # HTTPS only for admin
+        https_redirect_status_code: 426
+
+    plugins:
+      # Rate limiting
+      - name: rate-limiting
+        config:
+          minute: 100
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_password: ${REDIS_PASSWORD}
+          fault_tolerant: true
+
+      # JWT Authentication for admin users
+      - name: jwt
+        config:
+          uri_param_names:
+            - jwt
+          cookie_names: []
+          key_claim_name: kid
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+            - nbf
+          run_on_preflight: true
+          maximum_expiration: 86400  # 24 hours
+
+      # Security headers
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Content-Type-Options:nosniff
+              - X-Frame-Options:SAMEORIGIN
+              - X-XSS-Protection:1; mode=block
+              - Strict-Transport-Security:max-age=31536000; includeSubDomains
+              - Content-Security-Policy:default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
+
+      # CORS
+      - name: cors
+        config:
+          origins:
+            - ${FRONTEND_URL}
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+          credentials: true
+          max_age: 3600
+
+      # Prometheus metrics
+      - name: prometheus
+
+  # Health check endpoint (no authentication)
+  - name: health-service
+    url: http://backend:8000/health
+    protocol: http
+    host: backend
+    port: 8000
+    path: /health
+
+    routes:
+      - name: health-route
+        paths:
+          - /health
+          - /ready
+        methods:
+          - GET
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+    plugins:
+      # No authentication for health checks
+      # High rate limit for monitoring systems
+      - name: rate-limiting
+        config:
+          minute: 1000
+          policy: local
+
+# Global plugins
+plugins:
+  # IP restriction (optional - configure allowed IPs)
+  - name: ip-restriction
+    config:
+      allow:
+        - 0.0.0.0/0  # Allow all by default, customize in production
+      deny: []
+
+  # Request size limiting
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10  # 10MB max
+      size_unit: megabytes
+      require_content_length: false
+
+  # Bot detection (optional)
+  - name: bot-detection
+    config:
+      allow: []
+      deny: []
+
+# Consumers (API key holders)
+consumers:
+  - username: agent-a2a-client
+    custom_id: a2a-integration-001
+    tags:
+      - external
+      - a2a-protocol
+    keyauth_credentials:
+      - key: ${A2A_API_KEY}
+
+  - username: frontend-client
+    custom_id: frontend-001
+    tags:
+      - internal
+      - web-app
+    keyauth_credentials:
+      - key: ${FRONTEND_API_KEY}
+
+  - username: monitoring-client
+    custom_id: monitoring-001
+    tags:
+      - internal
+      - monitoring
+    keyauth_credentials:
+      - key: ${MONITORING_API_KEY}
+
+# Upstream health checks
+upstreams:
+  - name: backend-upstream
+    algorithm: round-robin
+    hash_on: none
+    hash_fallback: none
+    hash_on_cookie_path: /
+    slots: 10000
+    healthchecks:
+      active:
+        type: http
+        http_path: /health
+        https_verify_certificate: false
+        healthy:
+          interval: 10
+          http_statuses:
+            - 200
+            - 302
+          successes: 2
+        unhealthy:
+          interval: 5
+          http_statuses:
+            - 429
+            - 500
+            - 503
+          tcp_failures: 3
+          timeouts: 3
+          http_failures: 5
+      passive:
+        type: http
+        healthy:
+          http_statuses:
+            - 200
+            - 201
+            - 202
+            - 203
+            - 204
+            - 205
+            - 206
+            - 207
+            - 208
+            - 226
+            - 300
+            - 301
+            - 302
+            - 303
+            - 304
+            - 305
+            - 306
+            - 307
+            - 308
+          successes: 5
+        unhealthy:
+          http_statuses:
+            - 429
+            - 500
+            - 503
+          tcp_failures: 2
+          timeouts: 7
+          http_failures: 5
+    tags:
+      - backend
+
+    targets:
+      - target: backend:8000
+        weight: 100
+        tags:
+          - primary

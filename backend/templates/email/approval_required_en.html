@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Required</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #ff9900;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .approval-details {
+            background-color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9900;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Approval Required</h1>
+    </div>
+
+    <div class="content">
+        <h2>Approval Request</h2>
+
+        <p>A new offer requires your approval before it can be sent to the customer.</p>
+
+        <div class="approval-details">
+            <h3>Offer Details</h3>
+            <p><strong>Offer Number:</strong> {{ offer_number }}</p>
+            <p><strong>Customer:</strong> {{ customer_name }}</p>
+            <p><strong>Total Value:</strong> {{ total_value }} {{ currency }}</p>
+        </div>
+
+        <div class="alert">
+            <strong>Reason:</strong> The offer value exceeds the EUR 100,000 threshold and therefore requires manager approval.
+        </div>
+
+        <p>Please review the offer and make your decision:</p>
+
+        <p style="text-align: center;">
+            <a href="{{ approval_link }}" class="button">Review and Approve Offer</a>
+        </p>
+
+        <p>You can approve, reject, or send the offer back for revision.</p>
+
+        <p>Best regards,<br>
+        AI Offer Agent System</p>
+    </div>
+
+    <div class="footer">
+        <p>This is an automated email.</p>
+        <p>&copy; 2025 AI Offer Agent. All rights reserved.</p>
+    </div>
+</body>
+</html>
